@@ -7,6 +7,8 @@ Supported Characters
 ====================
  - VHDL'93 supports the full table of [ISO-8859-1 characters](http://kireji.com/reference/iso88591.html) (0x00 through 0xFF(255))
  - The font included includes 0x00 through 0x7F(127)
+ - Non printing characters are supported using concatenation. ex.
+  - `constant heart_msg : string := "I" & ETX & "You";`
 
 Supported Boards
 ================
