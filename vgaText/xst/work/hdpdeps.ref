@@ -1,0 +1,29 @@
+V3 14
+FL "D:/Libraries/EE/FPGA/Basys 2/vgaText/fontROM.vhd" 2013/07/11.14:37:21 P.58f
+EN work/fontROM 1373919267 FL "D:/Libraries/EE/FPGA/Basys 2/vgaText/fontROM.vhd" \
+      PB ieee/std_logic_1164 1364358218 PB ieee/NUMERIC_STD 1364358223
+AR work/fontROM/Behavioral 1373919268 \
+      FL "D:/Libraries/EE/FPGA/Basys 2/vgaText/fontROM.vhd" EN work/fontROM 1373919267
+FL "D:/Libraries/EE/FPGA/Basys 2/vgaText/text_line.vhd" 2013/07/15.15:13:29 P.58f
+EN work/text_line 1373919269 \
+      FL "D:/Libraries/EE/FPGA/Basys 2/vgaText/text_line.vhd" \
+      PB ieee/std_logic_1164 1364358218 PB ieee/STD_LOGIC_UNSIGNED 1364358221 \
+      PB ieee/NUMERIC_STD 1364358223 PB work/text_package 1373919266
+AR work/text_line/Behavioral 1373919270 \
+      FL "D:/Libraries/EE/FPGA/Basys 2/vgaText/text_line.vhd" EN work/text_line 1373919269 \
+      CP fontROM
+FL "D:/Libraries/EE/FPGA/Basys 2/vgaText/text_package.vhd" 2013/07/15.15:11:40 P.58f
+PH work/text_package 1373919265 \
+      FL "D:/Libraries/EE/FPGA/Basys 2/vgaText/text_package.vhd" \
+      PB ieee/std_logic_1164 1364358218
+PB work/text_package 1373919266 \
+      FL "D:/Libraries/EE/FPGA/Basys 2/vgaText/text_package.vhd" \
+      PH work/text_package 1373919265
+FL "D:/Libraries/EE/FPGA/Basys 2/vgaText/vgaText_top.vhd" 2013/07/15.15:13:31 P.58f
+EN work/vgaText_top 1373919271 \
+      FL "D:/Libraries/EE/FPGA/Basys 2/vgaText/vgaText_top.vhd" \
+      PB ieee/std_logic_1164 1364358218 PB ieee/STD_LOGIC_UNSIGNED 1364358221 \
+      PB ieee/NUMERIC_STD 1364358223 PB work/text_package 1373919266
+AR work/vgaText_top/Behavioral 1373919272 \
+      FL "D:/Libraries/EE/FPGA/Basys 2/vgaText/vgaText_top.vhd" \
+      EN work/vgaText_top 1373919271 CP text_line

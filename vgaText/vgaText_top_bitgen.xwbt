@@ -1,0 +1,8 @@
+INTSTYLE=ise
+INFILE=D:\Libraries\EE\FPGA\Basys 2\vgaText\vgaText_top.ncd
+OUTFILE=D:\Libraries\EE\FPGA\Basys 2\vgaText\vgaText_top.bit
+FAMILY=Spartan3E
+PART=xc3s250e-4cp132
+WORKINGDIR=D:\Libraries\EE\FPGA\Basys 2\vgaText
+LICENSE=WebPack
+USER_INFO=210668566_0_0_438

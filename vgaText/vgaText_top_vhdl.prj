@@ -1,0 +1,4 @@
+vhdl work "D:\Libraries\EE\FPGA\Basys 2\vgaText\text_package.vhd"
+vhdl work "D:\Libraries\EE\FPGA\Basys 2\vgaText\fontROM.vhd"
+vhdl work "D:\Libraries\EE\FPGA\Basys 2\vgaText\text_line.vhd"
+vhdl work "D:\Libraries\EE\FPGA\Basys 2\vgaText\vgaText_top.vhd"

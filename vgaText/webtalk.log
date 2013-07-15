@@ -1,0 +1,16 @@
+Release 14.5 - WebTalk (P.58f)
+Copyright (c) 1995-2010 Xilinx, Inc.  All rights reserved.
+
+Project Information
+--------------------
+ProjectID=8398E3DB44C3480598C9A52847B412D0
+ProjectIteration=15
+
+WebTalk Summary
+----------------
+INFO:WebTalk:1 - WebTalk is enabled because you are using a WebPACK license.
+
+INFO:WebTalk:8 - WebTalk Install setting is ON.
+INFO:WebTalk:6 - WebTalk User setting is ON.
+
+INFO:WebTalk:4 - D:/Libraries/EE/FPGA/Basys 2/vgaText/usage_statistics_webtalk.html WebTalk report has been successfully sent to Xilinx on 2013-07-15T15:21:07.  For additional details about this file, please refer to the WebTalk help file at C:/Xilinx/14.5/ISE_DS/ISE/data/reports/webtalk_introduction.html

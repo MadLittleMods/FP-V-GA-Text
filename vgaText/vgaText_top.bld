@@ -1,0 +1,36 @@
+Release 14.5 ngdbuild P.58f (nt64)
+Copyright (c) 1995-2012 Xilinx, Inc.  All rights reserved.
+
+Command Line: C:\Xilinx\14.5\ISE_DS\ISE\bin\nt64\unwrapped\ngdbuild.exe -filter
+iseconfig/filter.filter -intstyle ise -dd _ngo -nt timestamp -uc constraints.ucf
+-p xc3s250e-cp132-4 vgaText_top.ngc vgaText_top.ngd
+
+Reading NGO file "D:/Libraries/EE/FPGA/Basys 2/vgaText/vgaText_top.ngc" ...
+Gathering constraint information from source properties...
+Done.
+
+Annotating constraints to design from ucf file "constraints.ucf" ...
+Resolving constraint associations...
+Checking Constraint Associations...
+Done...
+
+Checking expanded design ...
+
+Partition Implementation Status
+-------------------------------
+
+  No Partitions were found in this design.
+
+-------------------------------
+
+NGDBUILD Design Results Summary:
+  Number of errors:     0
+  Number of warnings:   0
+
+Total memory usage is 214672 kilobytes
+
+Writing NGD file "vgaText_top.ngd" ...
+Total REAL time to NGDBUILD completion:  31 sec
+Total CPU time to NGDBUILD completion:   29 sec
+
+Writing NGDBUILD log file "vgaText_top.bld"...
