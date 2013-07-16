@@ -3,6 +3,8 @@ FP(V)GA-Text
 
 A simple to use VHDL module to display text on VGA display.
 
+![VGA Text Demo](https://raw.github.com/MadLittleMods/FP-V-GA-Text/master/vga-text-demo.png)
+
 Supported Characters
 ====================
  - VHDL'93 supports the full table of [ISO-8859-1 characters](http://kireji.com/reference/iso88591.html) (0x00 through 0xFF(255))
