@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <report-views version="2.0" >
  <header>
-  <DateModified>2013-07-15T09:46:23</DateModified>
+  <DateModified>2013-07-17T23:30:30</DateModified>
   <ModuleName>vgaText_top</ModuleName>
-  <SummaryTimeStamp>Unknown</SummaryTimeStamp>
+  <SummaryTimeStamp>2013-07-17T23:00:06</SummaryTimeStamp>
   <SavedFilePath>D:/Libraries/EE/FPGA/Basys 2/vgaText/iseconfig/vgaText_top.xreport</SavedFilePath>
   <ImplementationReportsDirectory>D:/Libraries/EE/FPGA/Basys 2/vgaText\</ImplementationReportsDirectory>
   <DateInitialized>2013-07-11T09:33:29</DateInitialized>
@@ -19,7 +19,7 @@
     <toc-item title="Detailed Reports" target="Detailed Reports" />
    </view>
    <view inputState="Unknown" program="implementation" contextTags="FPGA_ONLY" hidden="true" type="HTML" file="vgaText_top_envsettings.html" label="System Settings" />
-   <view inputState="Translated" program="map" locator="MAP_IOB_TABLE" contextTags="FPGA_ONLY" type="IOBProperties" file="vgaText_top_map.xrpt" label="IOB Properties" />
+   <view inputState="Translated" program="map" locator="MAP_IOB_TABLE" contextTags="FPGA_ONLY" type="IOBProperties" file="vgaText_top_map.xrpt" showConstraints="0" label="IOB Properties" />
    <view inputState="Translated" program="map" contextTags="FPGA_ONLY" hidden="true" type="Control_Sets" file="vgaText_top_map.xrpt" label="Control Set Information" />
    <view inputState="Translated" program="map" locator="MAP_MODULE_HIERARCHY" contextTags="FPGA_ONLY" type="Module_Utilization" file="vgaText_top_map.xrpt" label="Module Level Utilization" />
    <view inputState="Mapped" program="par" locator="CONSTRAINT_TABLE" contextTags="FPGA_ONLY" type="ConstraintsData" file="vgaText_top.ptwx" label="Timing Constraints" translator="ptwxToTableXML.xslt" />

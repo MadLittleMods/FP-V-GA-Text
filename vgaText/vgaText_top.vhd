@@ -52,54 +52,103 @@ entity vgaText_top is
 end vgaText_top;
 
 architecture Behavioral of vgaText_top is
-	COMPONENT text_line
-	generic (
-		textPassageLength: integer;
-		fontWidth: integer;
-		fontHeight: integer
-	);
-	PORT(
-		clk: in std_logic;
-		textPassage: in string;
-		position: in point_2d;
-		hCounter: in std_logic_vector(9 downto 0);
-		vCounter: in std_logic_vector(9 downto 0);
-		pixelOn: out std_logic;
-		rgbPixel: out std_logic_vector(7 downto 0);
-		debug: out type_text_lineDebug
-   );
-	END COMPONENT;
 	
 	signal hCounter: std_logic_vector(9 downto 0) := (others => '0');
 	signal vCounter: std_logic_vector(9 downto 0) := (others => '0');
 	
 	signal divide_by_2 : std_logic := '0';
 	
-	signal pixelDraw_text1: std_logic_vector(8 downto 0);
 	
-	signal text_lineDebug: type_text_lineDebug;
+	constant NUM_TEXT_ELEMENTS: integer := 2;
+	signal inArbiterPortArray: type_inArbiterPortArray(0 to NUM_TEXT_ELEMENTS-1);
+	signal outArbiterPortArray: type_outArbiterPortArray(0 to NUM_TEXT_ELEMENTS-1);
+	
+	signal inArbiterPort1: type_inArbiterPort;
+	signal inArbiterPort2: type_inArbiterPort;
+	
+	
+	signal pixelDraw_text1: std_logic_vector(8 downto 0);
+	signal pixelDraw_text2: std_logic_vector(8 downto 0);
+	--signal pixelDraw_text3: std_logic_vector(8 downto 0);
+	
+	signal text_lineDebug1: type_text_lineDebug;
+	signal text_lineDebug2: type_text_lineDebug;
+	--signal text_lineDebug3: type_text_lineDebug;
 	
 begin
 
 	Led <= std_logic_vector(to_unsigned(character'pos('A'), 8));
 	--Led <= text_lineDebug.debugDraw(text_lineDebug.debugDraw'left downto text_lineDebug.debugDraw'left-7);
 
-	textDrawComponent: text_line
+	inArbiterPortArray <= (inArbiterPort1, inArbiterPort2);
+
+	fontLibraryArbiter: entity work.BlockRamArbiter
+	generic map(
+		numPorts => NUM_TEXT_ELEMENTS
+	)
+	port map (
+		clk => clk,
+		reset => reset,
+		inPortArray => inArbiterPortArray,
+		outPortArray => outArbiterPortArray
+	);
+
+
+	textDrawElement: entity work.text_line
 	generic map (
-		textPassageLength => 11,
-		fontWidth => 8,
-		fontHeight => 16
+		textPassageLength => 11
 	)
 	port map(
 		clk => clk,
+		reset => reset,
 		textPassage => "Hello World",
 		position => (50, 50),
+		colorMap => (10 downto 0 => "111" & "111" & "11"),
+		inArbiterPort => inArbiterPort1,
+		outArbiterPort => outArbiterPortArray(0),
 		hCounter => hCounter,
 		vCounter => vCounter,
 		pixelOn => pixelDraw_text1(pixelDraw_text1'left),
 		rgbPixel => pixelDraw_text1(pixelDraw_text1'left-1 downto 0),
-		debug => text_lineDebug
+		debug => text_lineDebug1
 	);
+	
+	
+	textDrawElement2: entity work.text_line
+	generic map (
+		textPassageLength => 3
+	)
+	port map(
+		clk => clk,
+		reset => reset,
+		textPassage => SOH & " " & STX,
+		position => (50, 200),
+		colorMap => (2 downto 0 => "111" & "111" & "11"),
+		inArbiterPort => inArbiterPort2,
+		outArbiterPort => outArbiterPortArray(1),
+		hCounter => hCounter,
+		vCounter => vCounter,
+		pixelOn => pixelDraw_text2(pixelDraw_text2'left),
+		rgbPixel => pixelDraw_text2(pixelDraw_text2'left-1 downto 0),
+		debug => text_lineDebug2
+	);
+
+--	textDrawElement3: entity work.text_line
+--	generic map (
+--		textPassageLength => 8
+--	)
+--	port map(
+--		clk => clk,
+--		reset => reset,
+--		textPassage => "I " & "<3" & " You",
+--		position => (70, 125),
+--		--colorMap => testColorMap,--(1 => "111" & "000" & "00", others => "111" & "111" & "11"), -- (0 => "111" & "111" & "11", 1 => "111" & "000" & "00", 2 => "111" & "111" & "11", 3 => "111" & "111" & "11", 4 => "111" & "111" & "11"),
+--		hCounter => hCounter,
+--		vCounter => vCounter,
+--		pixelOn => pixelDraw_text3(pixelDraw_text3'left),
+--		rgbPixel => pixelDraw_text3(pixelDraw_text3'left-1 downto 0),
+--		debug => text_lineDebug3
+--	);
 	
 	
 	vgasignal: process(clk)
@@ -148,7 +197,11 @@ begin
 						-- Draw stack:
 						-- Draw text
 						if (pixelDraw_text1(pixelDraw_text1'left) = '1') then
-							rgbDrawColor := pixelDraw_text1(pixelDraw_text1'left-1 downto 0);		
+							rgbDrawColor := pixelDraw_text1(pixelDraw_text1'left-1 downto 0);
+						elsif (pixelDraw_text2(pixelDraw_text2'left) = '1') then
+							rgbDrawColor := pixelDraw_text2(pixelDraw_text2'left-1 downto 0);
+--						elsif (pixelDraw_text3(pixelDraw_text3'left) = '1') then
+--							rgbDrawColor := pixelDraw_text3(pixelDraw_text3'left-1 downto 0);
 						else
 							rgbDrawColor := "000" & "000" & "00";
 						end if;

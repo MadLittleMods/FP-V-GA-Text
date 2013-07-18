@@ -1,4 +1,0 @@
-vhdl work "text_package.vhd"
-vhdl work "fontROM.vhd"
-vhdl work "text_line.vhd"
-vhdl work "vgaText_top.vhd"

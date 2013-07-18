@@ -44,8 +44,14 @@ entity text_line is
 	);
 	port (
 		clk: in std_logic;
-		textPassage: in string(1 to textPassageLength);
+		reset: in std_logic;
+		textPassage: in string(1 to textPassageLength) := (others => NUL);
 		position: in point_2d := (0, 0); -- top left corner of text
+		colorMap: in type_textColorMap(0 to textPassageLength-1) := (others => "111" & "111" & "11");
+		
+		inArbiterPort: out type_inArbiterPort;
+		outArbiterPort: in type_outArbiterPort;
+		
 		hCounter: in std_logic_vector(9 downto 0);
 		vCounter: in std_logic_vector(9 downto 0);
 		pixelOn: out std_logic;
@@ -57,37 +63,19 @@ end text_line;
 
 architecture Behavioral of text_line is
 
-	COMPONENT fontROM
-	generic (
-		ADDR_WIDTH: integer;
-		DATA_WIDTH: integer
-	);
-	PORT(
-		clk: in std_logic;
-      addr: in std_logic_vector(10 downto 0);
-      data: out std_logic_vector(7 downto 0)
-   );
-	END COMPONENT;
-
 	signal pixelBuffer : std_logic;
 	signal RGBBuffer : std_logic_vector(7 downto 0) := "111" & "111" & "11";
 
 
 	signal rom_addr: std_logic_vector(10 downto 0);
 	-- Address in textROM where character is
-	signal char_addr: std_logic_vector(6 downto 0); -- 2 ^ 7 = 128
+	signal char_addr: std_logic_vector(6 downto 0) := (others => '0'); -- 2 ^ 7 = 128
 	-- Vertical row of character in textROM at char_addr offset
 	signal row_addr: std_logic_vector(3 downto 0) := (others => '0'); -- 2 ^ 4 = 16
 	
-	-- Data that pops out from the RAM
-	signal fontRowData: std_logic_vector(7 downto 0);
-	
-	--type type_characterMemory is array (0 to fontHeight-1) of std_logic_vector(fontWidth-1 downto 0);
-	--type type_textMemory is array (0 to textPassage'length-1) of type_characterMemory;
-	
 	-- Array of row map of all characters lined up
 	type type_textMemory is array (0 to fontHeight-1) of std_logic_vector((textPassage'length*fontWidth)-1 downto 0);
-	signal textMemory: type_textMemory;
+	signal textMemory: type_textMemory := (others => (others => '0'));
 	
 begin
 	
@@ -95,19 +83,8 @@ begin
 	rgbPixel <= RGBBuffer;
 	
 	rom_addr <= char_addr & row_addr;
+	inArbiterPort.addr <= rom_addr;
 
-	textDB: fontROM
-	generic map (
-		ADDR_WIDTH => 11,
-		DATA_WIDTH => 8
-	)
-	port map(
-		clk => clk,
-		addr => rom_addr,
-		data => fontRowData
-	);
-	
-	
 	initializeMemory: process(clk)
 		-- Strings index start at 1...
 		variable currCharacter: integer := 1;
@@ -116,45 +93,70 @@ begin
 		variable currState: type_memoryFillLoopState := state_updateCharAddr;
 		
 		variable prevTextPassage: string(textPassage'left to textPassage'right);
-		
+		variable prevData: type_outArbiterPort;
 	begin
 		
 		if rising_edge(clk) then
-			if prevTextPassage /= textPassage then
-				-- String index start at 1 so ye...
-				if currCharacter-1 < textPassage'length then
-					case currState is
-						when state_updateCharAddr =>
-							
-							--char_addr <= ascii_address_xref(textPassage(currCharacter))(6 downto 0);
-							char_addr <= std_logic_vector(to_unsigned(character'pos(textPassage(currCharacter)), 7));
-							
-							-- Change State
-							currState := state_fillMemory;
-							
-						when state_fillMemory =>
-							-- Store the data that poped out on the rising edge
-							--textMemory(currCharacter)(to_integer(unsigned(row_addr))) <= fontRowData;
-							textMemory(to_integer(unsigned(row_addr))) <= textMemory(to_integer(unsigned(row_addr)))(((textPassage'length-1)*fontWidth)-1 downto 0) & fontRowData;
-					
-							-- Now that we stored we advance the row address
-							row_addr <= row_addr + 1;
-							if row_addr >= fontHeight-1 then
-								row_addr <= (others => '0');
-								
-								currCharacter := currCharacter + 1;
-							end if;
-							
-							-- Change State
-							currState := state_updateCharAddr;
-							
-					end case;
-				else
-					prevTextPassage := textPassage;
-					currCharacter := 1;
-				end if;
-			end if;
+			-- While reset is high then we reset the positions
+			if reset = '1' then
+				currCharacter := 1;
+				currState := state_updateCharAddr;
+				prevTextPassage := (others => NUL);
+				prevData := outArbiterPort;
 				
+				char_addr <= (others => '0');
+				row_addr <= (others => '0');
+				textMemory <= (others => (others => '0'));
+			else
+		
+				if prevTextPassage /= textPassage then
+					-- String index start at 1 so ye...
+					if currCharacter-1 < textPassage'length then
+						case currState is
+							when state_updateCharAddr =>
+								
+								--char_addr <= ascii_address_xref(textPassage(currCharacter))(6 downto 0);
+								char_addr <= std_logic_vector(to_unsigned(character'pos(textPassage(currCharacter)), 7));
+								
+								-- Change State
+								currState := state_fillMemory;
+								
+							when state_fillMemory =>
+								
+								if outArbiterPort.dataWaiting then
+								
+									-- Store the data that poped out on the rising edge
+									--textMemory(currCharacter)(to_integer(unsigned(row_addr))) <= fontRowData;
+									textMemory(to_integer(unsigned(row_addr))) <= textMemory(to_integer(unsigned(row_addr)))(((textPassage'length-1)*fontWidth)-1 downto 0) & outArbiterPort.data;
+							
+									-- Now that we stored we advance the row address
+									row_addr <= row_addr + 1;
+									if row_addr >= fontHeight-1 then
+										row_addr <= (others => '0');
+										
+										currCharacter := currCharacter + 1;
+									end if;
+									
+									-- Set the prev data so next time we can compare correctly
+									prevData := outArbiterPort;
+									
+									-- Change State
+									currState := state_updateCharAddr;
+								else
+									-- Change State
+									-- We haven't grabbed the data yet soo keep trying
+									currState := state_fillMemory;
+								end if;
+								
+						end case;
+					else
+						prevTextPassage := textPassage;
+						currCharacter := 1;
+					end if;
+				end if;
+				
+				
+			end if;
 		end if;
 			
 	end process;
@@ -170,7 +172,7 @@ begin
 				-- to_integer(unsigned(vCounter - position.y))
 				-- to_integer(unsigned(hCounter - position.x))
 				if textMemory(to_integer(unsigned(vCounter - position.y)))(textMemory(0)'length-1 - to_integer(unsigned(hCounter - position.x))) = '1' then
-					RGBBuffer <= "111" & "111" & "11";
+					RGBBuffer <= colorMap(to_integer(unsigned(hCounter - position.x))/fontWidth);
 					pixelBuffer <= '1';
 				end if;
 				

@@ -1,8 +1,0 @@
-AR fontrom behavioral "D:/Libraries/EE/FPGA/Basys 2/vgaText/fontROM.vhd" sub00/vhpl03 1373919268
-PB text_package text_package "D:/Libraries/EE/FPGA/Basys 2/vgaText/text_package.vhd" sub00/vhpl01 1373919266
-EN vgatext_top NULL "D:/Libraries/EE/FPGA/Basys 2/vgaText/vgaText_top.vhd" sub00/vhpl06 1373919271
-PH text_package NULL "D:/Libraries/EE/FPGA/Basys 2/vgaText/text_package.vhd" sub00/vhpl00 1373919265
-AR vgatext_top behavioral "D:/Libraries/EE/FPGA/Basys 2/vgaText/vgaText_top.vhd" sub00/vhpl07 1373919272
-AR text_line behavioral "D:/Libraries/EE/FPGA/Basys 2/vgaText/text_line.vhd" sub00/vhpl05 1373919270
-EN fontrom NULL "D:/Libraries/EE/FPGA/Basys 2/vgaText/fontROM.vhd" sub00/vhpl02 1373919267
-EN text_line NULL "D:/Libraries/EE/FPGA/Basys 2/vgaText/text_line.vhd" sub00/vhpl04 1373919269

@@ -14,21 +14,25 @@ use ieee.numeric_std.all;
 
 entity fontROM is
 	generic(
-		ADDR_WIDTH: integer := 11;
-		DATA_WIDTH: integer := 8
+		addrWidth: integer := 11;
+		dataWidth: integer := 8
 	);
    port(
       clk: in std_logic;
-      addr: in std_logic_vector(10 downto 0);
-      data: out std_logic_vector(7 downto 0)
+      addr_A: in std_logic_vector(addrWidth-1 downto 0);
+      data_A: out std_logic_vector(dataWidth-1 downto 0);
+		
+		addr_B: in std_logic_vector(addrWidth-1 downto 0);
+      data_B: out std_logic_vector(dataWidth-1 downto 0)
    );
 end fontROM;
 
 architecture Behavioral of fontROM is
    
-   signal addr_reg: std_logic_vector(ADDR_WIDTH-1 downto 0);
+   signal addr_reg_A: std_logic_vector(addrWidth-1 downto 0);
+	signal addr_reg_B: std_logic_vector(addrWidth-1 downto 0);
    
-   type rom_type is array (0 to 2**ADDR_WIDTH-1) of std_logic_vector(DATA_WIDTH-1 downto 0);
+   type rom_type is array (0 to 2**addrWidth-1) of std_logic_vector(dataWidth-1 downto 0);
    
    -- ROM definition
    constant ROM: rom_type := (   -- 2^11-by-8
@@ -2215,10 +2219,12 @@ begin
    process (clk)
    begin
       if rising_edge(clk) then
-        addr_reg <= addr;
+        addr_reg_A <= addr_A;
+		  addr_reg_B <= addr_B;
       end if;
    end process;
 	
-   data <= ROM(to_integer(unsigned(addr_reg)));
+   data_A <= ROM(to_integer(unsigned(addr_reg_A)));
+	data_B <= ROM(to_integer(unsigned(addr_reg_B)));
 	
 end Behavioral;
