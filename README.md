@@ -20,8 +20,7 @@ TODO:
 =====
  - Expand included font to support the full 0x00 through 0xFF character range
 
-Notes:
-======
+### Notes:
  - The original font ROM pops up in many projects and sites (below). It has been since updated and cleaned up for this project.
   - https://ece320web.groups.et.byu.net/labs/VGATextGeneration/VGA_Terminal.html
   - https://github.com/thelonious/vga_generator
