@@ -19,6 +19,7 @@ The constraints (.ucf) is configured for the [Basys 2](http://www.digilentinc.co
 TODO:
 =====
  - Expand included font to support the full 0x00 through 0xFF character range
+ - Fix the unnesecary font_rom for each text_line
 
 ### Notes:
  - The original font ROM pops up in many projects and sites (below). It has been since updated and cleaned up for this project.
