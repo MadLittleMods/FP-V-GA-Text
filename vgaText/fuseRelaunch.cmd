@@ -1,1 +1,0 @@
--intstyle "ise" -incremental -o "D:/Libraries/EE/FPGA/Basys 2/vgaText/tb_vgaText1_isim_beh.exe" -prj "D:/Libraries/EE/FPGA/Basys 2/vgaText/tb_vgaText1_beh.prj" "work.tb_vgaText1" 

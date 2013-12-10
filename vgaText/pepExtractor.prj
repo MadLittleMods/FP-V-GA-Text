@@ -1,5 +1,0 @@
-work	"fontROM.vhd"
-work	"my_package.vhd"
-work	"text_line.vhd"
-work	"text_package.vhd"
-work	"vgaText_top.vhd"

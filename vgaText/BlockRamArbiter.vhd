@@ -1,10 +1,10 @@
 ----------------------------------------------------------------------------------
--- Company: Visual Pulse
--- Engineer: Eric (MLM)
+-- Company: 
+-- Engineer: 
 -- 
--- Create Date:    19:28:21 07/16/2013 
+-- Create Date:    15:24:50 11/19/2013 
 -- Design Name: 
--- Module Name:    BlockRamArbiter - Behavioral 
+-- Module Name:    blockRamArbiter - Behavioral 
 -- Project Name: 
 -- Target Devices: 
 -- Tool versions: 
@@ -33,119 +33,196 @@ use IEEE.STD_LOGIC_1164.ALL;
 --so don't forget to include this directory. 
 library work;
 --this line also is must.This includes the particular package into your program.
-use work.text_package.all;
+use work.commonPak.all;
 
-
-entity BlockRamArbiter is
+entity blockRamArbiter is
 	generic(
 		numPorts: integer := 2
 	);
-	port (
+	port(
 		clk: in std_logic;
 		reset: in std_logic;
-		inPortArray: in type_inArbiterPortArray(0 to numPorts-1);
-		outPortArray: out type_outArbiterPortArray(0 to numPorts-1)
+		inPortArray: in type_inArbiterPortArray(0 to numPorts-1); -- Give us the address and whether you request it now
+		outPortArray: out type_outArbiterPortArray(0 to numPorts-1) := (others => init_type_outArbiterPort) -- We give you data in this array
 	);
-end BlockRamArbiter;
+end blockRamArbiter;
 
-architecture Behavioral of BlockRamArbiter is
-	signal romAddr_A: std_logic_vector(ADDR_WIDTH-1 downto 0) := (others => '0');
-	signal romAddr_B: std_logic_vector(ADDR_WIDTH-1 downto 0) := (others => '0');
+architecture Behavioral of blockRamArbiter is
+	-- Holds the address we intend to use/used
+	signal addrReg: std_logic_vector(ADDR_WIDTH-1 downto 0) := (others => '0');
+	-- Holds the most recent data we just got
+	signal dataOutReg: std_logic_vector(DATA_WIDTH-1 downto 0) := (others => '0');
 	
-	-- Data that pops out from the RAM
-	signal rowData_A: std_logic_vector(DATA_WIDTH-1 downto 0) := (others => '0');
-	signal rowData_B: std_logic_vector(DATA_WIDTH-1 downto 0) := (others => '0');
+	signal writeEnableReg: std_logic := '0';
+	signal dataInReg: std_logic_vector(DATA_WIDTH-1 downto 0) := (others => '0');
+	
 begin
 
-	textDB: entity work.fontROM
-	generic map (
-		addrWidth => ADDR_WIDTH,
-		dataWidth => DATA_WIDTH
-	)
+	-- This is the basically the database
+	-- Accessed by address
+	blockRam: entity work.fontROM
 	port map(
-		clk => clk,
-		addr_A => romAddr_A,
-		data_A => rowData_A,
-		addr_B => romAddr_B,
-		data_B => rowData_B
+		clkA => clk,
+		writeEnableA => writeEnableReg,
+		addrA => addrReg,
+		dataOutA => dataOutReg,
+		dataInA => dataInReg
 	);
 	
-	arbitration: process(clk)
-		variable currPortIndex_A: integer := 0;
-		variable currPortIndex_B: integer := 1;
+	arbiter: process(clk)
+		-- Stores the current index as we roll through `inPortArray` and store the data in `outPortArray`
+		variable currPortIndex: integer := 0;
+		variable nextPortIndex: integer := -1;
 		
-		variable prevCurrPortIndex_A: integer := 0;
-		variable prevCurrPortIndex_B: integer := 1;
-		
-		variable isSetup: boolean;
-		
-		type type_arbiterLoopState is (state_updateRomAddr, state_presentData);
+		type type_arbiterLoopState is (state_updateRomAddr, state_waitForRomData, state_presentData, state_getNextPort);
 		variable currState: type_arbiterLoopState := state_updateRomAddr;
 	begin
 		if rising_edge(clk) then
-		
-			if reset = '1' or not(isSetup) then
-				if(numPorts >= 2) then
-					currPortIndex_A := 0;
-					currPortIndex_B := 1;
-				else
-					currPortIndex_A := 0;
-					currPortIndex_B := 0;
-				end if;
+			
+			if reset = '1' then
+				-- Reset the array
+				outPortArray <= (others => init_type_outArbiterPort);
 				
-				prevCurrPortIndex_A := currPortIndex_A;
-				prevCurrPortIndex_B := currPortIndex_B;
+				currPortIndex := 0;
+				nextPortIndex := -1;
 				
-				isSetup := true;
+				
+				addrReg <= (others => '0');
+				writeEnableReg <= '0';
+				dataInReg <= (others => '0');
+				
+				-- Reset State
+				currState := state_updateRomAddr;
 			else
+			
+				
 				case currState is
 					when state_updateRomAddr =>
 						
-						-- Turn off data waiting
-						outPortArray(prevCurrPortIndex_A).dataWaiting <= false;
-						outPortArray(prevCurrPortIndex_B).dataWaiting <= false;
+						-- Start the read request
+						------------------------------
+						if inPortArray(currPortIndex).dataRequest then
+							-- If they are making a new request then we have no data waiting yet
+							outPortArray(currPortIndex).dataWaiting <= false;
 						
-						-- Update address
-						romAddr_A <= inPortArray(currPortIndex_A).addr;
-						romAddr_B <= inPortArray(currPortIndex_B).addr;
+							-- Change the address so that on the next cycle,
+							-- we have some corresponding data in `dataOutReg`
+							addrReg <= inPortArray(currPortIndex).addr;
+							
+							-- Change State
+							currState := state_waitForRomData;
+							
+						end if;
 						
-						-- Change State
-						currState := state_presentData;
+						-- Start the write request
+						-----------------------------
+						if inPortArray(currPortIndex).writeRequest then
+							addrReg <= inPortArray(currPortIndex).addr;
+							
+							dataInReg <= inPortArray(currPortIndex).writeData; -- Put the data in the ram register
+							writeEnableReg <= '1'; -- Tell the ram we are ready
+							
+							outPortArray(currPortIndex).dataWritten <= false; -- Tell the outside, that we haven't wrote it yet
 						
-					when state_presentData =>
-						outPortArray(currPortIndex_A).data <= rowData_A;
-						outPortArray(currPortIndex_B).data <= rowData_B;
+							-- Change State
+							currState := state_waitForRomData;
+						end if;
 						
-						-- Data waiting
-						outPortArray(currPortIndex_A).dataWaiting <= true;
-						outPortArray(currPortIndex_B).dataWaiting <= true;
+						-- If we are not doing anything, 
+						-- then we should go find another port
+						if not inPortArray(currPortIndex).dataRequest and not inPortArray(currPortIndex).writeRequest then
+							-- If the current port doesn't want data, find one, that does
+							-- Change State
+							currState := state_getNextPort;
+						end if;
 						
-						-- Store previous state so we can turn off data waiting later
-						prevCurrPortIndex_A := currPortIndex_A;
-						prevCurrPortIndex_B := currPortIndex_B;
 						
-						
-						if(numPorts >= 2) then
-							-- Jump ahead 2 because we have dual port ram
-							currPortIndex_A := currPortIndex_A + 2;
-							if currPortIndex_A > inPortArray'length-2 then
-								currPortIndex_A := 0;
-							end if;
-							-- We want to be one ahead of A
-							currPortIndex_B := currPortIndex_A + 1;
+					-- Wait for the data to be ready
+					-- This could be read, write, or both
+					when state_waitForRomData =>
+						if inPortArray(currPortIndex).dataRequest or inPortArray(currPortIndex).writeRequest then
+							-- Change State
+							currState := state_presentData;
 						else
-							currPortIndex_A := 0;
-							currPortIndex_B := 0;
+							-- If the current port doesn't want data, find one, that does
+							-- Change State
+							currState := state_getNextPort;
+						end if;
+					
+					-- Put the data in the array for use
+					when state_presentData =>
+				
+						-- If they want the data, then give it
+						if inPortArray(currPortIndex).dataRequest then
+							outPortArray(currPortIndex).data <= dataOutReg;
+							outPortArray(currPortIndex).dataWaiting <= true;
+							
+						-- If they don't want the data, we have no data waiting
+						else
+							outPortArray(currPortIndex).dataWaiting <= false;
+						end if;
+						
+						-- We wrote to the ram, so tell them
+						if inPortArray(currPortIndex).writeRequest then
+							dataInReg <= (others => '0'); 
+							writeEnableReg <= '0';
+							
+							outPortArray(currPortIndex).dataWritten <= true; -- Tell the outside, we wrote it!
+						end if;
+						
+						
+						-- We go to find a new port no matter what...
+						-- Change State
+						currState := state_getNextPort;
+						
+					when state_getNextPort =>
+						-- Roll to the next port
+						--------------------------
+						
+						-- Move to the next port that has a request
+						nextPortIndex := -1;
+						for i in 0 to inPortArray'length-1 loop
+							if i > currPortIndex and (inPortArray(i).dataRequest or inPortArray(i).writeRequest) then
+								nextPortIndex := i;
+								exit;
+							else
+								outPortArray(i).dataWaiting <= false;
+								outPortArray(i).dataWritten <= false;
+							end if;
+						end loop;
+						-- If we didn't find the next port from the loop above
+						-- Then start at the beginning and go to the where we are
+						if nextPortIndex <= 0 then
+							for i in 0 to inPortArray'length-1 loop
+								if i <= currPortIndex then
+									if inPortArray(i).dataRequest or inPortArray(i).writeRequest then
+										nextPortIndex := i;
+										exit;
+									else
+										outPortArray(i).dataWaiting <= false;
+										outPortArray(i).dataWritten <= false;
+									end if;
+								else
+									exit;
+								end if;
+							end loop;
 						end if;
 						
 						-- Change State
-						currState := state_updateRomAddr;
+						-- We are stuck here until we find
+						if nextPortIndex >= 0 then
+							currPortIndex := nextPortIndex;
+							currState := state_updateRomAddr;
+						end if;
+						
 				end case;
 				
 			end if;
-				
 		end if;
+	
 	end process;
+	
+	
 
 end Behavioral;
 

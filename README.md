@@ -3,7 +3,7 @@ FP(V)GA-Text
 
 A simple to use VHDL module to display text on VGA display.
 
-![VGA Text Demo](https://raw.github.com/MadLittleMods/FP-V-GA-Text/master/vga-text-demo.png)
+![VGA Text Demo](https://raw.github.com/MadLittleMods/FP-V-GA-Text/master/vga-text-demo-side-by-side.png)
 
 Supported Characters
 ====================
@@ -18,8 +18,20 @@ The constraints (.ucf) is configured for the [Basys 2](http://www.digilentinc.co
 
 TODO:
 =====
- - Expand included font to support the full 0x00 through 0xFF character range
- - Fix the unnesecary font_rom for each text_line
+ - Expand included font to support the full 0x00 through 0xFF (255) character range
+
+
+Changelog:
+==========
+
+## 2013-12-9
+
+ - Added a font rom arbiter: This gets rid of the unnecessary font map for every text_line module and frees up board space.
+ - Moved to block ram for the personal storage of each text_line module. This saves a lot of board space. We used to use an array of long std_logic_vectors
+
+## 2013-7-13
+ - Working text modules but took up a lot of board real estate.
+
 
 ### Notes:
  - The original font ROM pops up in many projects and sites (below). It has been since updated and cleaned up for this project.
