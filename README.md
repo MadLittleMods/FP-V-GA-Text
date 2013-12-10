@@ -24,16 +24,17 @@ TODO:
 Changelog:
 ==========
 
-## 2013-12-9
+### 2013-12-9
 
  - Added a font rom arbiter: This gets rid of the unnecessary font map for every text_line module and frees up board space.
  - Moved to block ram for the personal storage of each text_line module. This saves a lot of board space. We used to use an array of long std_logic_vectors
 
-## 2013-7-13
+### 2013-7-13
  - Working text modules but took up a lot of board real estate.
 
 
-### Notes:
+
+## Notes:
  - The original font ROM pops up in many projects and sites (below). It has been since updated and cleaned up for this project.
   - https://ece320web.groups.et.byu.net/labs/VGATextGeneration/VGA_Terminal.html
   - https://github.com/thelonious/vga_generator
