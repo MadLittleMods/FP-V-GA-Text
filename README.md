@@ -5,6 +5,13 @@ A simple to use VHDL module to display text on VGA display.
 
 ![VGA Text Demo](https://raw.github.com/MadLittleMods/FP-V-GA-Text/master/vga-text-demo-side-by-side.png)
 
+# [VGA Simulator](http://ericeastwood.com/lab/vga-simulator/)
+
+Go simulate your own VHDL projects or even the ones you build with this text library. A faster better way to debug projects with VGA.
+
+Go to straight to the [tool](http://ericeastwood.com/lab/vga-simulator/). Or [read a bit about it and how to set it up](http://ericeastwood.com/blog/8/vga-simulator-getting-started).
+
+
 Supported Characters
 ====================
  - VHDL'93 supports the full table of [ISO-8859-1 characters](http://kireji.com/reference/iso88591.html) (0x00 through 0xFF(255))
