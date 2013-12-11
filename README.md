@@ -9,7 +9,7 @@ A simple to use VHDL module to display text on VGA display.
 
 Go simulate your own VHDL projects or even the ones you build with this text library. A faster better way to debug projects with VGA.
 
-Go to straight to the [tool](http://ericeastwood.com/lab/vga-simulator/). Or [read a bit about it and how to set it up](http://ericeastwood.com/blog/8/vga-simulator-getting-started).
+Go straight to the [tool](http://ericeastwood.com/lab/vga-simulator/). Or [read a bit about it and how to set it up](http://ericeastwood.com/blog/8/vga-simulator-getting-started).
 
 
 Supported Characters
