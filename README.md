@@ -31,6 +31,9 @@ TODO:
 Changelog:
 ==========
 
+### 2013-12-15
+ - Bug fix! Fixed a problem where text does not appear if you only use 1 text_line module.
+
 ### 2013-12-9
 
  - Added a font rom arbiter: This gets rid of the unnecessary font map for every text_line module and frees up board space.
