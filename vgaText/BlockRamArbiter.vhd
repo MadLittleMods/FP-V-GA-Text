@@ -71,7 +71,7 @@ begin
 	
 	arbiter: process(clk)
 		-- Stores the current index as we roll through `inPortArray` and store the data in `outPortArray`
-		variable currPortIndex: integer := 0;
+		variable currPortIndex: integer range 0 to numPorts-1 := 0;
 		variable nextPortIndex: integer := -1;
 		
 		type type_arbiterLoopState is (state_updateRomAddr, state_waitForRomData, state_presentData, state_getNextPort);
